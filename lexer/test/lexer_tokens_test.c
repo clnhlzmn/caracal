@@ -12,5 +12,6 @@ int main(void) {
         assert((size_t)output->type == i);
         output = output->next;
     }
+    assert(output == NULL);
     return 0;
 }
