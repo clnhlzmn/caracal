@@ -24,6 +24,8 @@ typedef struct lexer_token lexer_token;
 struct lexer_token {
     const char *text;
     lexer_token_type type;
+    size_t line;
+    size_t column;
     lexer_token *next;
 };
 
