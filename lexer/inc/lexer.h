@@ -29,4 +29,6 @@ struct lexer_token {
 
 lexer_return lexer_lex(lexer_token **output, const char *input);
 
+lexer_return lexer_free(lexer_token *tokens);
+
 #endif /*LEXER_H*/

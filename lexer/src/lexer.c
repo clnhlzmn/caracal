@@ -75,3 +75,15 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
     }
     return LEXER_SUCCESS;
 }
+
+lexer_return lexer_free(lexer_token *tokens) {
+    while (tokens) {
+        lexer_token *current = tokens;
+        tokens = tokens->next;
+        if (current->type == LEXER_NATURAL || current->type == LEXER_ID) {
+            free(current->text);
+        }
+        free(current);
+    }
+    return LEXER_SUCCESS;
+}
