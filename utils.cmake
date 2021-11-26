@@ -1,4 +1,7 @@
 function(add_tests test_sources libraries)
+    if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+        return()
+    endif()
     foreach(file ${test_sources})
         get_filename_component(target_name ${file} NAME_WE)
         add_executable(${target_name} ${file})

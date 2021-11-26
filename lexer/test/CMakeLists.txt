@@ -1,2 +1,2 @@
 file(GLOB test_sources *test.c)
-add_tests(${test_sources} "")
+add_tests("${test_sources}" lexer)

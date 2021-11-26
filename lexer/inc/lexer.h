@@ -21,7 +21,7 @@ struct lexer_token;
 
 typedef struct lexer_token lexer_token;
 
-struct {
+struct lexer_token {
     const char *text;
     lexer_token_type type;
     lexer_token *next;
