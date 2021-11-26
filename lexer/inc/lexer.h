@@ -14,7 +14,7 @@ typedef enum {
     LEXER_SEMI,
     LEXER_COMMA,
     LEXER_NATURAL,
-    LEXER_ID
+    LEXER_ID,
 } lexer_token_type;
 
 struct lexer_token;

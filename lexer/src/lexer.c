@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdlib.h>
+#include <string.h>
 #include "lexer.h"
 
 static lexer_token *make_token(const char *text, lexer_token_type type) {
@@ -30,45 +31,43 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
     if (!output || !input) return LEXER_FAILURE;
     *output = NULL;
     lexer_token *tail = NULL;
-    for (char c = *input; c; c = *++input) {
+    while (1) {
+        char c = *input;
+        if (!c) break;
         lexer_token *token = NULL;
         if (c == '{') {
-            token = make_token(NULL, LEXER_L_BRACKET);
-            token->text = "{";
+            token = make_token("{", LEXER_L_BRACKET);
+            input++;
         } else if (c == '}') {
-            token = make_token(NULL, LEXER_R_BRACKET);
-            token->text = "}";
+            token = make_token("}", LEXER_R_BRACKET);
+            input++;
         } else if (c == '(') {
-            token = make_token(NULL, LEXER_L_PAREN);
-            token->text = "(";
+            token = make_token("(", LEXER_L_PAREN);
+            input++;
         } else if (c == ')') {
-            token = make_token(NULL, LEXER_R_PAREN);
-            token->text = ")";
+            token = make_token(")", LEXER_R_PAREN);
+            input++;
         } else if (c == ';') {
-            token = make_token(NULL, LEXER_SEMI);
-            token->text = ";";
+            token = make_token(";", LEXER_SEMI);
+            input++;
         } else if (c == ',') {
-            token = make_token(NULL, LEXER_COMMA);
-            token->text = ",";
+            token = make_token(",", LEXER_COMMA);
+            input++;
         } else if (isdigit(c)) {
             const char *start = input;
-            for (; isdigit(c); c = *++input) {
-                if (!isdigit(*(input + 1)))
-                    break;
-            }
-            size_t len = input - start + 1;
+            for (; isdigit(c); c = *++input) {}
+            size_t len = input - start;
             token = make_token(NULL, LEXER_NATURAL);
             token->text = copy_text(start, len);
         } else if (isalpha(c) || c == '_') {
             const char *start = input;
-            for (; isalpha(c) || isdigit(c) || c == '_'; c = *++input) {
-                char next = *(input + 1);
-                if (!isalpha(next) || !isdigit(next) || next != '_')
-                    break;
-            }
-            size_t len = input - start + 1;
+            for (; isalpha(c) || isdigit(c) || c == '_'; c = *++input) {}
+            size_t len = input - start;
             token = make_token(NULL, LEXER_ID);
             token->text = copy_text(start, len);
+        } else if (isspace(c)) {
+            for (; isspace(c); c = *++input) {}
+            continue;
         } else {
             return LEXER_FAILURE;
         }
