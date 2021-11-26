@@ -10,6 +10,9 @@ int main(void) {
     for (size_t i = 0; i < strlen(input); ++i) {
         assert(output);
         assert((size_t)output->type == i);
+        char text[2] = {0};
+        memcpy(text, &input[i], 1);
+        assert(strcmp(text, output->text) == 0);
         output = output->next;
     }
     assert(output == NULL);
