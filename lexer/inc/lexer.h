@@ -1,6 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+#include <stdlib.h>
+
 typedef enum {
     LEXER_SUCCESS,
     LEXER_FAILURE
