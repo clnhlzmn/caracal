@@ -1,0 +1,55 @@
+expr
+    : ID '=' orExpr
+    : orExpr
+    ;
+
+orExpr
+    : andExpr ("||" andExpr)*
+    ;
+
+andExpr
+    : unaryRelExpr ("&&" unaryRelExpr)*
+    ;
+
+unaryRelExpr
+    : "!" unaryRelExpr
+    | relExpr
+    ;
+
+relExpr
+    : sumExpr (relop sumExpr)?
+    ;
+
+relop: "<=" | "<" | ">" | ">=" | "==" | "!=" ;
+
+sumExpr
+    : mulExpr (sumop mulExpr)*
+    ;
+
+sumop: "+" | "-" ;
+
+mulExpr
+    : unaryExpr (mulop unaryExpr)*
+    ;
+
+mulop: "*" | "/" | "%" ;
+
+unaryExpr
+    : "-" unaryExpr
+    | factor
+    ;
+
+factor
+    : "(" expr ")" factor1
+    | NATURAL factor1
+    | ID factor1
+    ;
+
+factor1
+    : "(" args? ")" factor1
+    | e
+    ;
+
+args
+    : expr ("," expr)*
+    ;
