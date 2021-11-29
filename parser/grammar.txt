@@ -40,14 +40,13 @@ unaryExpr
     ;
 
 factor
-    : "(" expr ")" factor1
-    | NATURAL factor1
-    | ID factor1
+    : "(" expr ")" call?
+    | ID call?
+    | NATURAL
     ;
 
-factor1
-    : "(" args? ")" factor1
-    | e
+call
+    : "(" args? ")"
     ;
 
 args
