@@ -32,7 +32,7 @@ static parser_return sum_expr(const lexer_token **tokens);
 static parser_return mul_expr(const lexer_token **tokens);
 static parser_return unary_expr(const lexer_token **tokens);
 static parser_return factor_expr(const lexer_token **tokens);
-static parser_return factor1_expr(const lexer_token **tokens);
+static parser_return call(const lexer_token **tokens);
 
 static parser_return expr(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_ID) && token_type(*tokens, 1, LEXER_ASSIGN)) {
@@ -99,24 +99,24 @@ static parser_return factor_expr(const lexer_token **tokens) {
         parser_return err = expr(tokens);
         if (err) return err;
         if (!expect(tokens, LEXER_R_PAREN)) return PARSER_FAILURE;
-        return factor1_expr(tokens);
+        return call(tokens);
     } else if (token_type(*tokens, 0, LEXER_NATURAL)) {
         /*TODO use token to create NATURAL ast node*/
         return PARSER_SUCCESS;
     } else if (token_type(*tokens, 0, LEXER_ID)) {
         /*TODO use ID here*/
         consume(tokens, 1);
-        return factor1_expr(tokens);
+        return call(tokens);
     }
     return PARSER_FAILURE;
 }
 
-static parser_return factor1_expr(const lexer_token **tokens) {
+static parser_return call(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_L_PAREN)) {
         consume(tokens, 1);
         /*TODO parse args*/
         if (!expect(tokens, LEXER_R_PAREN)) return PARSER_FAILURE;
-        return factor1_expr(tokens);
+        return call(tokens);
     } else {
         return PARSER_SUCCESS;
     }

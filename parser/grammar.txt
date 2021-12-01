@@ -39,7 +39,7 @@ unaryExpr
     | factor
     ;
 
-factor
+factorExpr
     : "(" expr ")" call
     | ID call
     | NATURAL
