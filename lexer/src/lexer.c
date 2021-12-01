@@ -51,6 +51,9 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
         } else if (c == ')') {
             token = make_token(")", LEXER_R_PAREN, line, input - line_start + 1);
             input++;
+        } else if (c == '=') {
+            token = make_token("=", LEXER_ASSIGN, line, input - line_start + 1);
+            input++;
         } else if (c == ';') {
             token = make_token(";", LEXER_SEMI, line, input - line_start + 1);
             input++;

@@ -4,7 +4,7 @@
 #include "lexer.h"
 
 int main(void) {
-    const char *input = "{}();,1a";
+    const char *input = "{}()=;,1a";
     lexer_token *output = NULL;
     assert(lexer_lex(&output, input) == LEXER_SUCCESS);
     for (size_t i = 0; i < strlen(input); ++i) {

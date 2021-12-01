@@ -13,6 +13,7 @@ typedef enum {
     LEXER_R_BRACKET,
     LEXER_L_PAREN,
     LEXER_R_PAREN,
+    LEXER_ASSIGN,
     LEXER_SEMI,
     LEXER_COMMA,
     LEXER_NATURAL,
