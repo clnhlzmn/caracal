@@ -1,5 +1,6 @@
 #include "parser.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 static bool token_type(const lexer_token *tokens, size_t index, lexer_token_type type) {
     while (index--) {
@@ -36,7 +37,7 @@ static parser_return call(const lexer_token **tokens);
 
 static parser_return expr(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_ID) && token_type(*tokens, 1, LEXER_ASSIGN)) {
-        /*TODO use ID here*/
+        printf("%s = ", (*tokens)->text);
         consume(tokens, 2);
         return or_expr(tokens);
     }
@@ -46,7 +47,9 @@ static parser_return expr(const lexer_token **tokens) {
 static parser_return or_expr(const lexer_token **tokens) {
     parser_return err = and_expr(tokens);
     if (err) return err;
-    /*TODO check for OR operator and more andExpr*/
+    while (token_type(*tokens, 0, LEXER_OR)) {
+        
+    }
     return PARSER_SUCCESS;
 }
 
