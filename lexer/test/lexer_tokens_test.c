@@ -4,17 +4,18 @@
 #include "lexer.h"
 
 int main(void) {
-    const char *input = "{}()=;,1a";
-    lexer_token *output = NULL;
-    assert(lexer_lex(&output, input) == LEXER_SUCCESS);
-    for (size_t i = 0; i < strlen(input); ++i) {
+    const char *input[] = {
+        "{", "}", "(", ")", "||", "&&", "+", "-", "*", "/", "%", 
+        "!", "<", "<=", "==", ">", ">=", "!=", "=", ";", ",", 
+        "0123456789", "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789"
+    };
+    for (size_t i = 0; i < sizeof(input)/sizeof(const char *); ++i) {
+        lexer_token *output = NULL;
+        assert(lexer_lex(&output, input[i]) == LEXER_SUCCESS);
         assert(output);
         assert((size_t)output->type == i);
-        char text[2] = {0};
-        memcpy(text, &input[i], 1);
-        assert(strcmp(text, output->text) == 0);
-        output = output->next;
+        assert(strcmp(input[i], output->text) == 0);
+        assert(output->next == NULL);
     }
-    assert(output == NULL);
     return 0;
 }

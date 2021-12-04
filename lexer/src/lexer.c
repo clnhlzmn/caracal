@@ -36,43 +36,84 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
     size_t line = 1;
     const char *line_start = input;
     while (1) {
-        char c = *input;
-        if (!c) break;
+        if (!input[0]) break;
         lexer_token *token = NULL;
-        if (c == '{') {
+        if (input[0] == '{') {
             token = make_token("{", LEXER_L_BRACKET, line, input - line_start + 1);
             input++;
-        } else if (c == '}') {
+        } else if (input[0] == '}') {
             token = make_token("}", LEXER_R_BRACKET, line, input - line_start + 1);
             input++;
-        } else if (c == '(') {
+        } else if (input[0] == '(') {
             token = make_token("(", LEXER_L_PAREN, line, input - line_start + 1);
             input++;
-        } else if (c == ')') {
+        } else if (input[0] == ')') {
             token = make_token(")", LEXER_R_PAREN, line, input - line_start + 1);
             input++;
-        } else if (c == '=') {
+        } else if (input[0] == '|' && input[1] == '|') {
+            token = make_token("||", LEXER_OR, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '&' && input[1] == '&') {
+            token = make_token("&&", LEXER_AND, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '+') {
+            token = make_token("+", LEXER_ADD, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '-') {
+            token = make_token("-", LEXER_SUB, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '*') {
+            token = make_token("*", LEXER_MUL, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '/') {
+            token = make_token("/", LEXER_DIV, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '%') {
+            token = make_token("%", LEXER_MOD, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '!') {
+            token = make_token("!", LEXER_NOT, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '<') {
+            token = make_token("<", LEXER_LESS, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '<' && input[1] == '=') {
+            token = make_token("<=", LEXER_LESS_EQUAL, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '=' && input[1] == '=') {
+            token = make_token("==", LEXER_EQUAL, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '>') {
+            token = make_token(">", LEXER_GREATER, line, input - line_start + 1);
+            input++;
+        } else if (input[0] == '>' && input[1] == '=') {
+            token = make_token(">=", LEXER_GREATER_EQUAL, line, input - line_start + 1);
+            input += 2;
+        }  else if (input[0] == '!' && input[1] == '=') {
+            token = make_token("!=", LEXER_NOT_EQUAL, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '=') {
             token = make_token("=", LEXER_ASSIGN, line, input - line_start + 1);
             input++;
-        } else if (c == ';') {
+        } else if (input[0] == ';') {
             token = make_token(";", LEXER_SEMI, line, input - line_start + 1);
             input++;
-        } else if (c == ',') {
+        } else if (input[0] == ',') {
             token = make_token(",", LEXER_COMMA, line, input - line_start + 1);
             input++;
-        } else if (isdigit(c)) {
+        } else if (isdigit(input[0])) {
             const char *start = input;
-            for (; isdigit(c); c = *++input) {}
+            for (; isdigit(input[0]); input++) {}
             size_t len = input - start;
             token = make_token(copy_text(start, len), LEXER_NATURAL, line, start - line_start + 1);
-        } else if (isalpha(c) || c == '_') {
+        } else if (isalpha(input[0]) || input[0] == '_') {
             const char *start = input;
-            for (; isalpha(c) || isdigit(c) || c == '_'; c = *++input) {}
+            for (; isalpha(input[0]) || isdigit(input[0]) || input[0] == '_'; input++) {}
             size_t len = input - start;
             token = make_token(copy_text(start, len), LEXER_ID, line, start - line_start + 1);
-        } else if (isspace(c)) {
-            for (; isspace(c); c = *++input) {
-                if (c == '\n') {
+        } else if (isspace(input[0])) {
+            for (; isspace(input[0]); input++) {
+                if (input[0] == '\n') {
                     line++;
                     line_start = input + 1;
                 }
