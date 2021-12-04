@@ -8,6 +8,6 @@ typedef enum {
     PARSER_FAILURE
 } parser_return;
 
-parser_return parse_expr(void *output, const lexer_token *tokens);
+parser_return parser_parse_expr(void *output, const lexer_token *tokens);
 
 #endif /*PARSER_H*/
