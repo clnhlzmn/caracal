@@ -71,27 +71,27 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
         } else if (input[0] == '%') {
             token = make_token("%", LEXER_MOD, line, input - line_start + 1);
             input++;
+        } else if (input[0] == '!' && input[1] == '=') {
+            token = make_token("!=", LEXER_NOT_EQUAL, line, input - line_start + 1);
+            input += 2;
         } else if (input[0] == '!') {
             token = make_token("!", LEXER_NOT, line, input - line_start + 1);
-            input++;
-        } else if (input[0] == '<') {
-            token = make_token("<", LEXER_LESS, line, input - line_start + 1);
             input++;
         } else if (input[0] == '<' && input[1] == '=') {
             token = make_token("<=", LEXER_LESS_EQUAL, line, input - line_start + 1);
             input += 2;
+        } else if (input[0] == '<') {
+            token = make_token("<", LEXER_LESS, line, input - line_start + 1);
+            input++;
         } else if (input[0] == '=' && input[1] == '=') {
             token = make_token("==", LEXER_EQUAL, line, input - line_start + 1);
+            input += 2;
+        } else if (input[0] == '>' && input[1] == '=') {
+            token = make_token(">=", LEXER_GREATER_EQUAL, line, input - line_start + 1);
             input += 2;
         } else if (input[0] == '>') {
             token = make_token(">", LEXER_GREATER, line, input - line_start + 1);
             input++;
-        } else if (input[0] == '>' && input[1] == '=') {
-            token = make_token(">=", LEXER_GREATER_EQUAL, line, input - line_start + 1);
-            input += 2;
-        }  else if (input[0] == '!' && input[1] == '=') {
-            token = make_token("!=", LEXER_NOT_EQUAL, line, input - line_start + 1);
-            input += 2;
         } else if (input[0] == '=') {
             token = make_token("=", LEXER_ASSIGN, line, input - line_start + 1);
             input++;
