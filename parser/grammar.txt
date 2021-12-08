@@ -46,10 +46,11 @@ factorExpr
     ;
 
 call
-    : "(" args? ")"
+    : "(" args ")"
     | e
     ;
 
 args
     : expr ("," expr)*
+    | e
     ;

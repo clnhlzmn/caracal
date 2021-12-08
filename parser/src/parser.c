@@ -3,6 +3,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 
+/**
+ * Compares the type of the token at @ref index in the @ref tokens list and returns 
+ * true if it is equal to @ref type and false otherwise
+ */
 static bool token_type(const lexer_token *tokens, size_t index, lexer_token_type type) {
     while (index--) {
         if (!tokens) return false;
@@ -12,14 +16,21 @@ static bool token_type(const lexer_token *tokens, size_t index, lexer_token_type
     return tokens->type == type;
 }
 
+/** 
+ * Takes @ref count @ref lexer_token_type as varargs and compares 
+ * them to the type of the token at @ref index in the @ref tokens list.
+ * If the token at @ref index in the @ref tokens list has the same type
+ * as any of the varargs then @ref token_types returns true otherwise
+ * it returns false.
+ */
 static bool token_types(const lexer_token *tokens, size_t index, size_t count, ...) {
     va_list ap;
     va_start(ap, count);
-    bool ret = true;
-    for (int i = 0; i < count; ++i) {
+    bool ret = false;
+    for (size_t i = 0; i < count; ++i) {
         lexer_token_type type = va_arg(ap, lexer_token_type);
-        if (!token_type(tokens, index, type)) {
-            ret = false;
+        if (token_type(tokens, index, type)) {
+            ret = true;
             break;
         }
     }
@@ -34,6 +45,7 @@ static void consume(const lexer_token **tokens, size_t num) {
 }
 
 static bool expect(const lexer_token **tokens, lexer_token_type type) {
+    if (!*tokens) return false;
     if ((*tokens)->type != type)
         return false;
     *tokens = (*tokens)->next;
@@ -50,6 +62,7 @@ static parser_return mul_expr(const lexer_token **tokens);
 static parser_return unary_expr(const lexer_token **tokens);
 static parser_return factor_expr(const lexer_token **tokens);
 static parser_return call(const lexer_token **tokens);
+static parser_return args(const lexer_token **tokens);
 
 static parser_return expr(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_ID) && token_type(*tokens, 1, LEXER_ASSIGN)) {
@@ -106,22 +119,33 @@ static parser_return rel_expr(const lexer_token **tokens) {
 static parser_return sum_expr(const lexer_token **tokens) {
     parser_return err = mul_expr(tokens);
     if (err) return err;
-    /*TODO check for sum op and more mulExpr*/
+    while (token_types(*tokens, 0, 2, LEXER_ADD, LEXER_SUB)) {
+        consume(tokens, 1);
+        parser_return err = mul_expr(tokens);
+        if (err) return err;
+    }
     return PARSER_SUCCESS;
 }
 
 static parser_return mul_expr(const lexer_token **tokens) {
     parser_return err = unary_expr(tokens);
     if (err) return err;
-    /*TODO check for sum op and more mulExpr*/
+    while (token_types(*tokens, 0, 3, LEXER_MUL, LEXER_DIV, LEXER_MOD)) {
+        consume(tokens, 1);
+        parser_return err = unary_expr(tokens);
+        if (err) return err;
+    }
     return PARSER_SUCCESS;
 }
 
 static parser_return unary_expr(const lexer_token **tokens) {
-    /*check for unary NEG here*/
+    if (token_type(*tokens, 0, LEXER_SUB)) {
+        consume(tokens, 1);
+        parser_return err = unary_expr(tokens);
+        return err;
+    }
     parser_return err = factor_expr(tokens);
     if (err) return err;
-    /*TODO check for sum op and more mulExpr*/
     return PARSER_SUCCESS;
 }
 
@@ -131,14 +155,17 @@ static parser_return factor_expr(const lexer_token **tokens) {
         parser_return err = expr(tokens);
         if (err) return err;
         if (!expect(tokens, LEXER_R_PAREN)) return PARSER_FAILURE;
-        return call(tokens);
+        err = call(tokens);
+        return err;
     } else if (token_type(*tokens, 0, LEXER_NATURAL)) {
         /*TODO use token to create NATURAL ast node*/
+        consume(tokens, 1);
         return PARSER_SUCCESS;
     } else if (token_type(*tokens, 0, LEXER_ID)) {
         /*TODO use ID here*/
         consume(tokens, 1);
-        return call(tokens);
+        parser_return err = call(tokens);
+        return err;
     }
     return PARSER_FAILURE;
 }
@@ -146,11 +173,31 @@ static parser_return factor_expr(const lexer_token **tokens) {
 static parser_return call(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_L_PAREN)) {
         consume(tokens, 1);
-        /*TODO parse args*/
+        parser_return err = args(tokens);
+        if (err) return err;
         if (!expect(tokens, LEXER_R_PAREN)) return PARSER_FAILURE;
         return call(tokens);
     } else {
         return PARSER_SUCCESS;
+    }
+}
+
+static parser_return args(const lexer_token **tokens) {
+    const lexer_token *backtrack = *tokens;
+    parser_return err = expr(tokens);
+    if (err) {
+        /* Failure to parse an expr means no arguments. */
+        *tokens = backtrack;
+        return PARSER_SUCCESS;
+    }
+    while (true) {
+        if (token_type(*tokens, 0, LEXER_COMMA)) {
+            consume(tokens, 1);
+        } else {
+            return PARSER_SUCCESS;
+        }
+        err = expr(tokens);
+        if (err) return err;
     }
 }
 
