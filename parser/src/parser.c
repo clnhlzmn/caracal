@@ -98,6 +98,8 @@ static parser_return and_expr(const lexer_token **tokens) {
 static parser_return unary_rel_expr(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_NOT)) {
         consume(tokens, 1);
+        parser_return err = unary_rel_expr(tokens);
+        return err;
     }
     parser_return err = rel_expr(tokens);
     if (err) return err;
