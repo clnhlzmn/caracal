@@ -1,3 +1,7 @@
+def 
+    : 'let' ID '=' word* '.'
+    ;
+
 word
     : ID
     | NATURAL

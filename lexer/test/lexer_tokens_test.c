@@ -5,7 +5,7 @@
 
 int main(void) {
     const char *input[] = {
-        "(", ")", "=", ".", 
+        "(", ")", "=", ".", "let",
         "0123456789", "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789"
     };
     for (size_t i = 0; i < sizeof(input)/sizeof(const char *); ++i) {

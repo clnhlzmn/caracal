@@ -12,6 +12,8 @@ typedef struct {
     parser_error error;
 } parser_return;
 
+parser_return parser_parse_def(const lexer_token *tokens);
+
 parser_return parser_parse_word(const lexer_token *tokens);
 
 #endif /*PARSER_H*/

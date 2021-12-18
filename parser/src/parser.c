@@ -66,11 +66,36 @@ static parser_return word(const lexer_token **tokens) {
                 consume(tokens, 1);
                 return (parser_return){ PARSER_SUCCESS };
             }
-            parser_return ret = word(tokens);
-            if (ret.error) return ret;
+            parser_return parsed_word = word(tokens);
+            if (parsed_word.error) return parsed_word;
         }
     }
     return (parser_return){ PARSER_FAILURE };
+}
+
+static parser_return def(const lexer_token **tokens) {
+    if (!expect(tokens, LEXER_LET)) {
+        return (parser_return){ PARSER_FAILURE };
+    }
+    if (!token_type(*tokens, 0, LEXER_ID)) {
+        return (parser_return){ PARSER_FAILURE };
+    }
+    consume(tokens, 1);
+    if (!expect(tokens, LEXER_ASSIGN)) {
+        return (parser_return){ PARSER_FAILURE };
+    }
+    while (1) {
+        if (token_type(*tokens, 0, LEXER_DOT)) {
+            consume(tokens, 1);
+            return (parser_return){ PARSER_SUCCESS };
+        }
+        parser_return parsed_word = word(tokens);
+        if (parsed_word.error) return parsed_word;
+    }
+}
+
+parser_return parser_parse_def(const lexer_token *tokens) {
+    return def(&tokens);
 }
 
 parser_return parser_parse_word(const lexer_token *tokens) {

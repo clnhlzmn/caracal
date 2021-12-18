@@ -50,6 +50,9 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
         } else if (input[0] == '.') {
             token = make_token(".", LEXER_DOT, line, input - line_start + 1);
             input++;
+        } else if (strncmp(input, "let", 3) == 0) {
+            token = make_token("let", LEXER_LET, line, input - line_start + 1);
+            input += 3;
         } else if (isdigit(input[0])) {
             const char *start = input;
             for (; isdigit(input[0]); input++) {}

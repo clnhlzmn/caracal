@@ -13,6 +13,7 @@ typedef enum {
     LEXER_R_PAREN,
     LEXER_ASSIGN,
     LEXER_DOT,
+    LEXER_LET,
     LEXER_NATURAL,
     LEXER_ID,
 } lexer_token_type;
