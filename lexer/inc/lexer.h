@@ -9,27 +9,10 @@ typedef enum {
 } lexer_return;
 
 typedef enum {
-    LEXER_L_BRACKET,
-    LEXER_R_BRACKET,
     LEXER_L_PAREN,
     LEXER_R_PAREN,
-    LEXER_OR,
-    LEXER_AND,
-    LEXER_ADD,
-    LEXER_SUB,
-    LEXER_MUL,
-    LEXER_DIV,
-    LEXER_MOD,
-    LEXER_NOT,
-    LEXER_LESS,
-    LEXER_LESS_EQUAL,
-    LEXER_EQUAL,
-    LEXER_GREATER,
-    LEXER_GREATER_EQUAL,
-    LEXER_NOT_EQUAL,
     LEXER_ASSIGN,
-    LEXER_SEMI,
-    LEXER_COMMA,
+    LEXER_DOT,
     LEXER_NATURAL,
     LEXER_ID,
 } lexer_token_type;
