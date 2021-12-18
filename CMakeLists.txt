@@ -11,3 +11,4 @@ target_compile_options(caracal PRIVATE ${OPTIONS})
 
 add_subdirectory(lexer)
 add_subdirectory(parser)
+add_subdirectory(ast)
