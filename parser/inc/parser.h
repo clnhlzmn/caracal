@@ -6,8 +6,12 @@
 typedef enum {
     PARSER_SUCCESS,
     PARSER_FAILURE
+} parser_error;
+
+typedef struct {
+    parser_error error;
 } parser_return;
 
-parser_return parser_parse_expr(void *output, const lexer_token *tokens);
+parser_return parser_parse_word(const lexer_token *tokens);
 
 #endif /*PARSER_H*/

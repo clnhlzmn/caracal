@@ -52,7 +52,26 @@ static bool expect(const lexer_token **tokens, lexer_token_type type) {
     return true;
 }
 
-parser_return parser_parse_expr(void *output, const lexer_token *tokens) {
-    (void)output;
-    return PARSER_SUCCESS;
+static parser_return word(const lexer_token **tokens) {
+    if (token_type(*tokens, 0, LEXER_NATURAL)) {
+        consume(tokens, 1);
+        return (parser_return){PARSER_SUCCESS};
+    } else if (token_type(*tokens, 0, LEXER_ID)) {
+        consume(tokens, 1);
+        return (parser_return){PARSER_SUCCESS};
+    } else if (token_type(*tokens, 0, LEXER_L_PAREN)) {
+        consume(tokens, 1);
+        while (1) {
+            if (token_type(*tokens, 0, LEXER_R_PAREN)) {
+                return (parser_return){PARSER_SUCCESS};
+            }
+            parser_return ret = word(tokens);
+            if (ret.error) return ret;
+        }
+    }
+    return (parser_return){PARSER_FAILURE};
+}
+
+parser_return parser_parse_word(const lexer_token *tokens) {
+    return word(&tokens);
 }

@@ -1,56 +1,5 @@
-expr
-    : ID '=' orExpr
-    : orExpr
-    ;
-
-orExpr
-    : andExpr ("||" andExpr)*
-    ;
-
-andExpr
-    : unaryRelExpr ("&&" unaryRelExpr)*
-    ;
-
-unaryRelExpr
-    : "!" unaryRelExpr
-    | relExpr
-    ;
-
-relExpr
-    : sumExpr (relop sumExpr)?
-    ;
-
-relop: "<=" | "<" | ">" | ">=" | "==" | "!=" ;
-
-sumExpr
-    : mulExpr (sumop mulExpr)*
-    ;
-
-sumop: "+" | "-" ;
-
-mulExpr
-    : unaryExpr (mulop unaryExpr)*
-    ;
-
-mulop: "*" | "/" | "%" ;
-
-unaryExpr
-    : "-" unaryExpr
-    | factor
-    ;
-
-factorExpr
-    : "(" expr ")" call
-    | ID call
+word
+    : ID
     | NATURAL
-    ;
-
-call
-    : "(" args ")"
-    | e
-    ;
-
-args
-    : expr ("," expr)*
-    | e
+    | '(' word* ')'
     ;
