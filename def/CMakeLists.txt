@@ -1,0 +1,5 @@
+add_library(def STATIC src/def.c)
+target_include_directories(def PUBLIC inc)
+target_link_libraries(def PUBLIC word)
+target_compile_options(def PRIVATE ${OPTIONS})
+add_subdirectory(test)
