@@ -53,6 +53,26 @@ static bool expect(const lexer_token **tokens, lexer_token_type type) {
     return true;
 }
 
+static parser_return parse_word_impl(const lexer_token **tokens);
+
+/* Trys to parse a list of words.
+ * If there were no words to parse then return value will be NULL,
+ * if there was one word then return value will be that word, and
+ * if there are two or more words then return value will be a compose
+ * word containing those words. */
+static word *parse_words_impl(const lexer_token **tokens) {
+    parser_return first = parse_word_impl(tokens);
+    if (first.error) {
+        return NULL;
+    }
+    word *rest = parse_words_impl(tokens);
+    if (rest == NULL) { /* No more words were found */
+        return first.value;
+    } else {
+        return word_make_compose(first.value, rest);
+    }
+}
+
 static parser_return parse_word_impl(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_NATURAL)) {
         int64_t value = atoll((*tokens)->text);
@@ -64,16 +84,13 @@ static parser_return parse_word_impl(const lexer_token **tokens) {
         return (parser_return){ .error = PARSER_SUCCESS, .value = word_make_name(name) };
     } else if (token_type(*tokens, 0, LEXER_L_PAREN)) {
         consume(tokens, 1);
-        while (1) {
-            if (token_type(*tokens, 0, LEXER_R_PAREN)) {
-                consume(tokens, 1);
-                return (parser_return){ PARSER_SUCCESS };
-            }
-            parser_return parsed_word = parse_word_impl(tokens);
-            if (parsed_word.error) return parsed_word;
+        word *words = parse_words_impl(tokens);
+        if (!expect(tokens, LEXER_R_PAREN)) {
+            return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
         }
+        return (parser_return){ .error = PARSER_SUCCESS, .value = word_make_quote(words) };
     }
-    return (parser_return){ PARSER_FAILURE };
+    return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
 }
 
 static parser_return def(const lexer_token **tokens) {
