@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "word.h"
+#include "def.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -93,29 +94,27 @@ static parser_return parse_word_impl(const lexer_token **tokens) {
     return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
 }
 
-static parser_return def(const lexer_token **tokens) {
+static parser_return parse_def_impl(const lexer_token **tokens) {
     if (!expect(tokens, LEXER_LET)) {
-        return (parser_return){ PARSER_FAILURE };
+        return (parser_return){ .error = PARSER_FAILURE, .value = NULL  };
     }
     if (!token_type(*tokens, 0, LEXER_ID)) {
-        return (parser_return){ PARSER_FAILURE };
+        return (parser_return){ .error = PARSER_FAILURE, .value = NULL  };
     }
+    const char *id = (*tokens)->text;
     consume(tokens, 1);
     if (!expect(tokens, LEXER_ASSIGN)) {
-        return (parser_return){ PARSER_FAILURE };
+        return (parser_return){ .error = PARSER_FAILURE, .value = NULL  };
     }
-    while (1) {
-        if (token_type(*tokens, 0, LEXER_DOT)) {
-            consume(tokens, 1);
-            return (parser_return){ PARSER_SUCCESS };
-        }
-        parser_return parsed_word = parse_word_impl(tokens);
-        if (parsed_word.error) return parsed_word;
+    word *value = parse_words_impl(tokens);
+    if (!expect(tokens, LEXER_DOT)) {
+        return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
     }
+    return (parser_return){ .error = PARSER_SUCCESS, .value = def_make_let(id, word_make_quote(value)) };
 }
 
 parser_return parser_parse_def(const lexer_token *tokens) {
-    return def(&tokens);
+    return parse_def_impl(&tokens);
 }
 
 parser_return parser_parse_word(const lexer_token *tokens) {
