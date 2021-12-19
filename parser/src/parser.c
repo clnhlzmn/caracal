@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "word.h"
 #include "def.h"
+#include "source_file.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -91,10 +92,38 @@ static parser_return parse_def_impl(const lexer_token **tokens) {
     return (parser_return){ .error = PARSER_SUCCESS, .value = def_make_let(id, word_make_quote(value)) };
 }
 
+/* Parses defs until there are no more defs to parse and
+ * returns the successfully parsed defs in a list. */
+static struct list parse_defs_impl(const lexer_token **tokens) {
+    struct list ret;
+    list_init(&ret);
+    while (1) {
+        parser_return result = parse_def_impl(tokens);
+        if (result.error == PARSER_FAILURE) {
+            break;
+        }
+        def *new_def = result.value;
+        list_append(&ret, &new_def->list);
+    }
+    return ret;
+}
+
+static parser_return parse_file_impl(const lexer_token **tokens, const char *file_name) {
+    struct list defs = parse_defs_impl(tokens);
+    if (*tokens != NULL) { /* Haven't reached the end of file. */
+        return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
+    }
+    return (parser_return){ .error = PARSER_SUCCESS, .value = source_file_make(file_name, defs) };
+}
+
 parser_return parser_parse_def(const lexer_token *tokens) {
     return parse_def_impl(&tokens);
 }
 
 parser_return parser_parse_word(const lexer_token *tokens) {
     return parse_word_impl(&tokens);
+}
+
+parser_return parser_parse_file(const lexer_token *tokens, const char *file_name) {
+    return parse_file_impl(&tokens, file_name);
 }

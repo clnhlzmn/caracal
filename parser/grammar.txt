@@ -1,4 +1,8 @@
-def 
+file
+    : def*
+    ;
+
+def
     : 'let' ID '=' word* '.'
     ;
 

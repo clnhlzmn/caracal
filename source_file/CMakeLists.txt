@@ -1,0 +1,5 @@
+add_library(source_file STATIC src/source_file.c)
+target_include_directories(source_file PUBLIC inc)
+target_link_libraries(source_file PUBLIC def)
+target_compile_options(source_file PRIVATE ${OPTIONS})
+add_subdirectory(test)
