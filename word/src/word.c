@@ -49,6 +49,8 @@ bool word_equal(word *a, word *b) {
         case WORD_COMPOSE:
             return word_equal(a->compose.first, b->compose.first)
                 && word_equal(a->compose.second, b->compose.second);
+        default:
+            return false;
         }
     }
 }
