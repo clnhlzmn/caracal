@@ -2,6 +2,7 @@
 #define WORD_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum {
     WORD_NAME,
@@ -46,5 +47,7 @@ word *word_make_number(int64_t value);
 word *word_make_compose(word *first, word *second);
 
 word *word_make_quote(word *word);
+
+bool word_equal(word *a, word *b);
 
 #endif /*WORD_H*/
