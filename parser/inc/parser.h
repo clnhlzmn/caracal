@@ -10,6 +10,7 @@ typedef enum {
 
 typedef struct {
     parser_error error;
+    void *value;
 } parser_return;
 
 parser_return parser_parse_def(const lexer_token *tokens);

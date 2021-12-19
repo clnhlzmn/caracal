@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "word.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -52,13 +53,15 @@ static bool expect(const lexer_token **tokens, lexer_token_type type) {
     return true;
 }
 
-static parser_return word(const lexer_token **tokens) {
+static parser_return parse_word_impl(const lexer_token **tokens) {
     if (token_type(*tokens, 0, LEXER_NATURAL)) {
+        int64_t value = atoll((*tokens)->text);
         consume(tokens, 1);
-        return (parser_return){ PARSER_SUCCESS };
+        return (parser_return){ .error = PARSER_SUCCESS, .value = word_make_number(value) };
     } else if (token_type(*tokens, 0, LEXER_ID)) {
+        const char *name = (*tokens)->text;
         consume(tokens, 1);
-        return (parser_return){ PARSER_SUCCESS };
+        return (parser_return){ .error = PARSER_SUCCESS, .value = word_make_name(name) };
     } else if (token_type(*tokens, 0, LEXER_L_PAREN)) {
         consume(tokens, 1);
         while (1) {
@@ -66,7 +69,7 @@ static parser_return word(const lexer_token **tokens) {
                 consume(tokens, 1);
                 return (parser_return){ PARSER_SUCCESS };
             }
-            parser_return parsed_word = word(tokens);
+            parser_return parsed_word = parse_word_impl(tokens);
             if (parsed_word.error) return parsed_word;
         }
     }
@@ -89,7 +92,7 @@ static parser_return def(const lexer_token **tokens) {
             consume(tokens, 1);
             return (parser_return){ PARSER_SUCCESS };
         }
-        parser_return parsed_word = word(tokens);
+        parser_return parsed_word = parse_word_impl(tokens);
         if (parsed_word.error) return parsed_word;
     }
 }
@@ -99,5 +102,5 @@ parser_return parser_parse_def(const lexer_token *tokens) {
 }
 
 parser_return parser_parse_word(const lexer_token *tokens) {
-    return word(&tokens);
+    return parse_word_impl(&tokens);
 }
