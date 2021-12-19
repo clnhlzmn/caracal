@@ -2,10 +2,12 @@
 #define DEF_H
 
 #include "word.h"
+#include "list.h"
 #include <stdbool.h>
 
 typedef struct
 {
+    struct list_element list;
     const char *id;
     word *value;
 } def;

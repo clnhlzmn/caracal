@@ -4,6 +4,7 @@
 
 def *def_make_let(const char *id, word *value) {
     def *ret = malloc(sizeof(def));
+    list_element_init(&ret->list);
     ret->id = id;
     ret->value = value;
     return ret;
