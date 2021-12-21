@@ -94,22 +94,19 @@ static parser_return parse_def_impl(const lexer_token **tokens) {
 
 /* Parses defs until there are no more defs to parse and
  * returns the successfully parsed defs in a list. */
-static struct list parse_defs_impl(const lexer_token **tokens) {
-    struct list ret;
-    list_init(&ret);
-    while (1) {
-        parser_return result = parse_def_impl(tokens);
-        if (result.error == PARSER_FAILURE) {
-            break;
-        }
-        def *new_def = result.value;
-        list_append(&ret, &new_def->list);
+static def *parse_defs_impl(const lexer_token **tokens) {
+    parser_return result = parse_def_impl(tokens);
+    if (result.error == PARSER_FAILURE) {
+        return NULL;
     }
-    return ret;
+    def *first = result.value;
+    result = parse_def_impl(tokens);
+    first->next = result.value;
+    return first;
 }
 
 static parser_return parse_file_impl(const lexer_token **tokens, const char *file_name) {
-    struct list defs = parse_defs_impl(tokens);
+    def *defs = parse_defs_impl(tokens);
     if (*tokens != NULL) { /* Haven't reached the end of file. */
         return (parser_return){ .error = PARSER_FAILURE, .value = NULL };
     }
