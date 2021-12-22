@@ -4,7 +4,8 @@
 #define FILES {                                                             \
     NULL,                                                                   \
     source_file_make("foo", NULL),                                          \
-    source_file_make("bar", def_make_list(1, def_make_let("foo", NULL)))    \
+    source_file_make("foo", def_make_let("foo", NULL)),                     \
+    source_file_make("bar", def_make_let("foo", NULL)),                     \
 }
 
 int main(void) {
