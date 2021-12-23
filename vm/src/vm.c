@@ -10,7 +10,7 @@ void vm_init(vm *self, heap *heap, intptr_t *stack, size_t stack_size, vm_word *
     self->words = words;
     self->word_count = word_count;
     self->program = NULL;
-    self->return_ = NULL;
+    self->return_stack = NULL;
 }
 
 void vm_push(vm *self, intptr_t v) {
@@ -55,17 +55,37 @@ intptr_t vm_pop_from(vm *self, heap_pair **stack) {
     return value;
 }
 
+void vm_call(vm *self, heap_pair *program) {
+    assert(self);
+    if (self->program) {
+        vm_pop_from(self, &self->program);
+        if (self->program) {
+            vm_push_to(self, &self->return_stack, (intptr_t)self->program);
+        }
+    }
+    self->program = program;
+}
+
+void vm_next_word(vm *self) {
+    vm_pop_from(self, &self->program);
+}
+
 void vm_run(vm *self, heap_pair *program) {
     assert(self);
-    while (program) {
-        if (HEAP_IS_INT(program->first)) {
-            intptr_t word_index = HEAP_INT_VALUE(program->first);
-            assert(word_index < (intptr_t)self->word_count);
-            vm_word word = self->words[word_index];
-            
-        } else {
-            
+    vm_push_to(self, &self->return_stack, (intptr_t)program);
+    while (true) {
+        if (self->return_stack == NULL) break;
+        self->program = (heap_pair*)vm_pop_from(self, &self->return_stack);
+        while (self->program) {
+            if (HEAP_IS_INT(self->program->first)) {
+                intptr_t index = HEAP_INT_VALUE(self->program->first);
+                assert(index < (intptr_t)self->word_count);
+                vm_word word = self->words[index];
+                word(self);
+            } else {
+                vm_push(self, self->program->first);
+                self->program = (heap_pair*)self->program->second;
+            }
         }
-        program = (heap_pair*)program->second;
     }
 }

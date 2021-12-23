@@ -12,12 +12,14 @@
 #endif
 
 void word_push_42(vm *vm) {
-    vm_push(vm, HEAP_MARK_INT(42)); 
+    vm_push(vm, HEAP_MARK_INT(42));
+    vm_next_word(vm);
 }
 
 void word_println(vm *vm) {
     printf("%"PRIdPTR"\n", *(vm->tos - 1));
     vm_drop(vm);
+    vm_next_word(vm);
 }
 
 vm test_vm;
