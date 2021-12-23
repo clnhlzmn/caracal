@@ -66,3 +66,8 @@ void heap_drop(heap *self, heap_pair *p) {
     if (!HEAP_IS_INT(p->second)) heap_drop(self, (heap_pair*)p->second);
     heap_free(self, p);
 }
+
+bool heap_is_empty(heap *self) {
+    assert(self);
+    return self->free_list == NULL;
+}

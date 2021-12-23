@@ -33,4 +33,8 @@ void vm_dup(vm *self);
 
 void vm_drop(vm *self);
 
+void vm_push_to(vm *self, heap_pair **stack, intptr_t value);
+
+intptr_t vm_pop_from(vm *self, heap_pair **stack);
+
 #endif /* VM_H */

@@ -14,7 +14,7 @@ int main(void) {
         for (int i = 1; i < TEST_VM_STACK_SIZE; ++i) {
             vm_dup(&test_vm);
         }
-        assert(test_heap.free_list == NULL);
+        assert(heap_is_empty(&test_heap));
         for (int i = 0; i < TEST_VM_STACK_SIZE; ++i) {
             vm_drop(&test_vm);
         }

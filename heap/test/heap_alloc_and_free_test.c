@@ -13,7 +13,7 @@ int main(void) {
             new_pair->second = (intptr_t)list;
             list = new_pair;
         }
-        assert(test_heap.free_list == NULL);
+        assert(heap_is_empty(&test_heap));
         while (list) {
             heap_pair *p = list;
             list = (heap_pair*)list->second;

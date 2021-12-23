@@ -9,6 +9,8 @@ void vm_init(vm *self, heap *heap, intptr_t *stack, size_t stack_size, vm_word *
     self->tos = stack;
     self->words = words;
     self->word_count = word_count;
+    self->program = NULL;
+    self->return_ = NULL;
 }
 
 void vm_push(vm *self, intptr_t v) {
@@ -34,6 +36,23 @@ void vm_dup(vm *self) {
 void vm_drop(vm *self) {
     intptr_t top = vm_pop(self);
     if (!HEAP_IS_INT(top)) heap_drop(self->heap, (heap_pair*)top);
+}
+
+void vm_push_to(vm *self, heap_pair **stack, intptr_t value) {
+    assert(self && stack);
+    heap_pair *new_pair = heap_alloc(self->heap);
+    new_pair->first = value;
+    new_pair->second = (intptr_t)*stack;
+    *stack = new_pair;
+}
+
+intptr_t vm_pop_from(vm *self, heap_pair **stack) {
+    assert(self && stack && *stack);
+    intptr_t value = (*stack)->first;
+    heap_pair *top = *stack;
+    *stack = (heap_pair*)(*stack)->second;
+    heap_free(self->heap, top);
+    return value;
 }
 
 void vm_run(vm *self, heap_pair *program) {

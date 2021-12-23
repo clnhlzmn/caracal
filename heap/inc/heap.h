@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define HEAP_IS_INT(v) (v & 1)
 #define HEAP_MARK_INT(v) ((v << 1) | 1)
@@ -35,5 +36,7 @@ heap_pair *heap_dup(heap *self, heap_pair *p);
 
 /* Returns the given heap_pair and its children to the free list. */
 void heap_drop(heap *self, heap_pair *p);
+
+bool heap_is_empty(heap *self);
 
 #endif /* HEAP_H */

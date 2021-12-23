@@ -23,7 +23,10 @@ void word_println(vm *vm) {
 vm test_vm;
 intptr_t stack[TEST_VM_STACK_SIZE];
 
-vm_word words[] = {word_push_42, word_println};
+vm_word words[] = {
+    [0] = word_push_42, 
+    [1] = word_println
+};
 
 void test_vm_init(void) {
     test_heap_init();
