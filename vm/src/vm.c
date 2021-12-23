@@ -11,21 +11,18 @@ void vm_init(vm *self, heap *heap, intptr_t *stack, size_t stack_size, vm_word *
     self->word_count = word_count;
 }
 
-/* Adds an item to the top of the stack */
 void vm_push(vm *self, intptr_t v) {
     assert(self);
     assert(self->tos - self->stack < (intptr_t)self->stack_size);
     *self->tos++ = v;
 }
 
-/* Removes an item from the stack, but doesn't free that item */
 intptr_t vm_pop(vm *self) {
     assert(self);
     assert(self->tos - self->stack > 0);
     return *--self->tos;
 }
 
-/* Duplicates the top of the stack */
 void vm_dup(vm *self) {
     intptr_t top = vm_pop(self);
     intptr_t dup = top;
@@ -44,7 +41,7 @@ void vm_run(vm *self, heap_pair *program) {
     while (program) {
         if (HEAP_IS_INT(program->first)) {
             intptr_t word_index = HEAP_INT_VALUE(program->first);
-            assert(word_index < (size_t)self->word_count);
+            assert(word_index < (intptr_t)self->word_count);
             vm_word word = self->words[word_index];
             
         } else {
