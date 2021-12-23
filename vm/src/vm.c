@@ -7,50 +7,6 @@
 
 #define HEAP_SIZE 1000
 
-static void heap_init(heap *self, pair *memory, size_t count) {
-    assert(self && memory);
-    self->memory = memory;
-    self->heap_size = count;
-    self->free_list = memory;
-    for (size_t i = 0; i < HEAP_SIZE; ++i) {
-        memory[i].second = (intptr_t)self->free_list;
-        self->free_list = &memory[i];
-    }
-}
-
-static pair *heap_alloc(heap *self) {
-    assert(self);
-    assert(self->free_list);
-    pair *ret = self->free_list;
-    self->free_list = (pair*)self->free_list->second;
-    return ret;
-}
-
-static void heap_free(heap *self, pair *p) {
-    if (!p) return;
-    p->second = (intptr_t)self->free_list;
-    self->free_list = p;
-}
-
-static pair *heap_dup(heap *self, pair *p) {
-    assert(self);
-    if (!p) return p;
-    pair *new_pair = heap_alloc(self);
-    if (IS_INT(p->first)) new_pair->first = p->first;
-    else new_pair->first = (intptr_t)heap_dup(self, (pair*)p->first);
-    if (IS_INT(p->second)) new_pair->second = p->second;
-    else new_pair->second = (intptr_t)heap_dup(self, (pair*)p->second);
-    return new_pair;
-}
-
-static void heap_drop(heap *self, pair *p) {
-    assert(self);
-    if (!p) return;
-    if (!IS_INT(p->first)) heap_drop(self, (pair*)p->first);
-    if (!IS_INT(p->second)) heap_drop(self, (pair*)p->second);
-    heap_free(self, p);
-}
-
 typedef struct vm vm;
 
 typedef void (*vm_word)(vm *);
