@@ -1,4 +1,5 @@
 #include "vm.h"
+#include <assert.h>
 
 #define TEST_VM_STACK_SIZE 100
 #define TEST_HEAP_SIZE (2 * TEST_VM_STACK_SIZE)
@@ -13,6 +14,7 @@ int main(void) {
         for (int i = 1; i < TEST_VM_STACK_SIZE; ++i) {
             vm_dup(&test_vm);
         }
+        assert(test_heap.free_list == NULL);
         for (int i = 0; i < TEST_VM_STACK_SIZE; ++i) {
             vm_drop(&test_vm);
         }
