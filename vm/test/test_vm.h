@@ -5,9 +5,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#ifndef TEST_VM_HEAP_SIZE
-#define TEST_VM_HEAP_SIZE 1000
-#endif
+#include "test_heap.h"
 
 #ifndef TEST_VM_STACK_SIZE
 #define TEST_VM_STACK_SIZE 1000
@@ -22,16 +20,13 @@ void word_println(vm *vm) {
     vm_drop(vm);
 }
 
-heap test_heap;
-heap_pair heap_mem[TEST_VM_HEAP_SIZE];
-
 vm test_vm;
 intptr_t stack[TEST_VM_STACK_SIZE];
 
 vm_word words[] = {word_push_42, word_println};
 
 void test_vm_init(void) {
-    heap_init(&test_heap, heap_mem, TEST_VM_HEAP_SIZE);
+    test_heap_init();
     vm_init(&test_vm, &test_heap, stack, TEST_VM_STACK_SIZE, words, sizeof(words) / sizeof(vm_word));
 }
 

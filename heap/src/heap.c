@@ -1,11 +1,12 @@
 #include "heap.h"
 #include <assert.h>
+#include <stdarg.h>
 
 void heap_init(heap *self, heap_pair *memory, size_t count) {
     assert(self && memory);
     self->memory = memory;
     self->heap_size = count;
-    self->free_list = memory;
+    self->free_list = NULL;
     for (size_t i = 0; i < count; ++i) {
         memory[i].second = (intptr_t)self->free_list;
         self->free_list = &memory[i];
@@ -17,6 +18,27 @@ heap_pair *heap_alloc(heap *self) {
     assert(self->free_list);
     heap_pair *ret = self->free_list;
     self->free_list = (heap_pair*)self->free_list->second;
+    return ret;
+}
+
+heap_pair *heap_alloc_list_impl(heap *self, size_t n, va_list *ap) {
+    if (n) {
+        intptr_t value = va_arg(*ap, intptr_t);
+        heap_pair *pair = heap_alloc(self);
+        pair->first = value;
+        pair->second = (intptr_t)heap_alloc_list_impl(self, n - 1, ap);
+        return pair;
+    } else {
+        return NULL;
+    }
+}
+
+heap_pair *heap_alloc_list(heap *self, size_t n, ...) {
+    assert(self);
+    va_list ap;
+    va_start(ap, n);
+    heap_pair *ret = heap_alloc_list_impl(self, n, &ap);
+    va_end(ap);
     return ret;
 }
 

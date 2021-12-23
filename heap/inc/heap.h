@@ -23,6 +23,10 @@ void heap_init(heap *self, heap_pair *memory, size_t count);
 
 heap_pair *heap_alloc(heap *self);
 
+/* Allocates n pairs with their second fields forming a linked list and 
+ * with the given values in their first fields. */
+heap_pair *heap_alloc_list(heap *self, size_t n, ...);
+
 /* Returns the given heap_pair to the free list. */
 void heap_free(heap *self, heap_pair *p);
 
