@@ -1,0 +1,5 @@
+add_library(type STATIC src/type.c)
+target_include_directories(type PUBLIC inc)
+target_compile_options(type PRIVATE ${OPTIONS})
+target_link_libraries(type PUBLIC word)
+add_subdirectory(test)
