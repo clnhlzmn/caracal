@@ -9,7 +9,7 @@ typedef enum {
     WORD_NUMBER,
     WORD_COMPOSE,
     WORD_QUOTE
-} word_type;
+} word_variant;
 
 typedef struct word word;
 
@@ -31,7 +31,7 @@ typedef struct {
 } word_quote;
 
 struct word {
-    word_type type;
+    word_variant variant;
     union {
         word_name name;
         word_number number;

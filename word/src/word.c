@@ -4,21 +4,21 @@
 
 word *word_make_name(const char *text) {
     word *ret = malloc(sizeof(word));
-    ret->type = WORD_NAME;
+    ret->variant = WORD_NAME;
     ret->name.text = text;
     return ret;
 }
 
 word *word_make_number(int64_t value) {
     word *ret = malloc(sizeof(word));
-    ret->type = WORD_NUMBER;
+    ret->variant = WORD_NUMBER;
     ret->number.value = value;
     return ret;
 }
 
 word *word_make_compose(word *first, word *second) {
     word *ret = malloc(sizeof(word));
-    ret->type = WORD_COMPOSE;
+    ret->variant = WORD_COMPOSE;
     ret->compose.first = first;
     ret->compose.second = second;
     return ret;
@@ -26,7 +26,7 @@ word *word_make_compose(word *first, word *second) {
 
 word *word_make_quote(word *quoted_word) {
     word *ret = malloc(sizeof(word));
-    ret->type = WORD_QUOTE;
+    ret->variant = WORD_QUOTE;
     ret->quote.word = quoted_word;
     return ret;
 }
@@ -36,10 +36,10 @@ bool word_equal(word *a, word *b) {
         return true;
     } else if ((!a && b) || (a && !b)) {
         return false;
-    } else if (a->type != b->type) {
+    } else if (a->variant != b->variant) {
         return false;
     } else {
-        switch (a->type) {
+        switch (a->variant) {
         case WORD_NAME:
             return strcmp(a->name.text, b->name.text) == 0;
         case WORD_NUMBER:
