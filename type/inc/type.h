@@ -7,14 +7,7 @@
 typedef enum {
     TYPE_VAR,
     TYPE_OP
-} type_class;
-
-typedef enum {
-    TYPE_OP_UNIT,
-    TYPE_OP_BOOL,
-    TYPE_OP_INT,
-    TYPE_OP_FUN
-} type_op_class;
+} type_variant;
 
 typedef struct type type;
 
@@ -24,13 +17,13 @@ typedef struct {
 } type_var;
 
 typedef struct {
-    type_op_class class_;
+    const char *operator;
     type *params;
-    size_t param_count;
 } type_op;
 
 struct type {
-    type_class class_;
+    type_variant variant;
+    type *next;
     union {
         type_var var;
         type_op op;
@@ -39,6 +32,7 @@ struct type {
 
 typedef enum {
     TYPE_INFERENCE_SUCCESS,
+    TYPE_INFERENCE_FAILURE_ARGS,
     TYPE_INFERENCE_FAILURE
 } type_error;
 
@@ -54,6 +48,12 @@ struct type_env {
     type *type;
     type_env *next;
 };
+
+type *type_make_var(void);
+
+type *type_make_op(const char *operator, type *params);
+
+type *type_make_op_from_args(const char *operator, size_t count, ...);
 
 type_inference_return type_infer_type_of_word(word *word, type_env *env);
 
