@@ -11,3 +11,10 @@ word
     | NATURAL
     | '(' word* ')'
     ;
+
+type
+    : ID ('->' type)?
+    | TYPENAME ('(' types ')')? ('->' type)?
+    | '(' type '.' type ')' ('->' type)?
+    | '(' types ')' '->' '(' types ')' ('->' type)?
+    ;

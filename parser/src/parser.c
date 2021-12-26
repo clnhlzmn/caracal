@@ -113,6 +113,10 @@ static parser_return parse_file_impl(const lexer_token **tokens, const char *fil
     return (parser_return){ .error = PARSER_SUCCESS, .value = source_file_make(file_name, defs) };
 }
 
+static parser_return parse_type_impl(const lexer_token **tokens) {
+    
+}
+
 parser_return parser_parse_def(const lexer_token *tokens) {
     return parse_def_impl(&tokens);
 }
@@ -123,4 +127,8 @@ parser_return parser_parse_word(const lexer_token *tokens) {
 
 parser_return parser_parse_file(const lexer_token *tokens, const char *file_name) {
     return parse_file_impl(&tokens, file_name);
+}
+
+parser_return parser_parse_type(const lexer_token *tokens) {
+    return parse_type_impl(&tokens);
 }

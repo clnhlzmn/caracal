@@ -19,4 +19,6 @@ parser_return parser_parse_word(const lexer_token *tokens);
 
 parser_return parser_parse_file(const lexer_token *tokens, const char *file_name);
 
+parser_return parser_parse_type(const lexer_token *tokens);
+
 #endif /*PARSER_H*/
