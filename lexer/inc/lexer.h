@@ -16,6 +16,8 @@ typedef enum {
     LEXER_LET,
     LEXER_NATURAL,
     LEXER_ID,
+    LEXER_TYPENAME,
+    LEXER_R_ARROW,
 } lexer_token_variant;
 
 struct lexer_token;

@@ -50,6 +50,9 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
         } else if (input[0] == '.') {
             token = make_token(".", LEXER_DOT, line, input - line_start + 1);
             input++;
+        } else if (input[0] == '-' && input[1] == '>') {
+            token = make_token("->", LEXER_R_ARROW, line, input - line_start + 1);
+            input += 2;
         } else if (strncmp(input, "let", 3) == 0) {
             token = make_token("let", LEXER_LET, line, input - line_start + 1);
             input += 3;
@@ -58,7 +61,7 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
             for (; isdigit(input[0]); input++) {}
             size_t len = input - start;
             token = make_token(copy_text(start, len), LEXER_NATURAL, line, start - line_start + 1);
-        } else if (isalpha(input[0]) || input[0] == '_') {
+        } else if (islower(input[0]) || input[0] == '_') {
             const char *start = input;
             for (; isalpha(input[0]) || isdigit(input[0]) || input[0] == '_'; input++) {}
             size_t len = input - start;
@@ -71,6 +74,11 @@ lexer_return lexer_lex(lexer_token **output, const char *input) {
                 }
             }
             continue;
+        } else if (isupper(input[0])) {
+            const char *start = input;
+            for (; isalpha(input[0]) || isdigit(input[0]) || input[0] == '_'; input++) {}
+            size_t len = input - start;
+            token = make_token(copy_text(start, len), LEXER_TYPENAME, line, start - line_start + 1);
         } else {
             return LEXER_FAILURE;
         }
