@@ -3,10 +3,10 @@
 #include <string.h>
 #include "lexer.h"
 
-static lexer_token *make_token(const char *text, lexer_token_type type, size_t line, size_t column) {
+static lexer_token *make_token(const char *text, lexer_token_variant variant, size_t line, size_t column) {
     lexer_token *token = malloc(sizeof(lexer_token));
     token->text = text;
-    token->type = type;
+    token->variant = variant;
     token->line = line;
     token->column = column;
     return token;
@@ -83,7 +83,7 @@ lexer_return lexer_free(lexer_token *tokens) {
     while (tokens) {
         lexer_token *current = tokens;
         tokens = tokens->next;
-        if (current->type == LEXER_NATURAL || current->type == LEXER_ID) {
+        if (current->variant == LEXER_NATURAL || current->variant == LEXER_ID) {
             free((void*)current->text);
         }
         free(current);

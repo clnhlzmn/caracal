@@ -12,7 +12,7 @@ int main(void) {
         lexer_token *output = NULL;
         assert(lexer_lex(&output, input[i]) == LEXER_SUCCESS);
         assert(output);
-        assert((size_t)output->type == i);
+        assert((size_t)output->variant == i);
         assert(strcmp(input[i], output->text) == 0);
         assert(output->next == NULL);
     }

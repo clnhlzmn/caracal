@@ -16,7 +16,7 @@ typedef enum {
     LEXER_LET,
     LEXER_NATURAL,
     LEXER_ID,
-} lexer_token_type;
+} lexer_token_variant;
 
 struct lexer_token;
 
@@ -24,7 +24,7 @@ typedef struct lexer_token lexer_token;
 
 struct lexer_token {
     const char *text;
-    lexer_token_type type;
+    lexer_token_variant variant;
     size_t line;
     size_t column;
     lexer_token *next;

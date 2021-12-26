@@ -10,13 +10,13 @@
  * Compares the type of the token at @ref index in the @ref tokens list and returns 
  * true if it is equal to @ref type and false otherwise
  */
-static bool token_type(const lexer_token *tokens, size_t index, lexer_token_type type) {
+static bool token_type(const lexer_token *tokens, size_t index, lexer_token_variant type) {
     while (index--) {
         if (!tokens) return false;
         tokens = tokens->next;
     }
     if (!tokens) return false;
-    return tokens->type == type;
+    return tokens->variant == type;
 }
 
 static void consume(const lexer_token **tokens, size_t num) {
@@ -25,9 +25,9 @@ static void consume(const lexer_token **tokens, size_t num) {
     }
 }
 
-static bool expect(const lexer_token **tokens, lexer_token_type type) {
+static bool expect(const lexer_token **tokens, lexer_token_variant type) {
     if (!*tokens) return false;
-    if ((*tokens)->type != type)
+    if ((*tokens)->variant != type)
         return false;
     *tokens = (*tokens)->next;
     return true;
