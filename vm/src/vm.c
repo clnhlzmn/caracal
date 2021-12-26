@@ -84,7 +84,7 @@ void vm_run(vm *self, heap_pair *program) {
                 word(self);
             } else {
                 vm_push(self, self->program->first);
-                self->program = (heap_pair*)self->program->second;
+                vm_next_word(self);
             }
         }
     }
