@@ -27,5 +27,11 @@ int main(void) {
     type0 = type_make_op("foo", type_make_op("bar", NULL));
     type1 = type_make_op_from_args("foo", 2, type_make_op("bar", NULL), type_make_op("bar", NULL));
     assert(!type_equal(type0, type1));
+    
+    type *param0 = type_make_var();
+    type *param1 = type_make_duplicate(param0);
+    type0 = type_make_op("foo", param0);
+    type1 = type_make_op("foo", param1);
+    assert(type_equal(type0, type1));
     return 0;
 }

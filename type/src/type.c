@@ -1,5 +1,6 @@
 #include "type.h"
 #include <stdarg.h>
+#include <string.h>
 
 static int id = 0;
 
@@ -8,6 +9,7 @@ static type *type_make_var_impl(int id) {
     ret->variant = TYPE_VAR;
     ret->var.id = id;
     ret->var.instance = NULL;
+    ret->next = NULL;
     return ret;
 }
 
@@ -20,6 +22,7 @@ type *type_make_op(const char *operator, type *params) {
     ret->variant = TYPE_OP;
     ret->op.operator = operator;
     ret->op.params = params;
+    ret->next = NULL;
     return ret;
 }
 
@@ -72,12 +75,13 @@ bool type_equal(type *a, type *b) {
     } else {
         switch (a->variant) {
         case TYPE_VAR:
-            return a->var.instance == b->var.instance 
-                && (a->var.id, b->var.id) == 0;
+            return type_equal(a->var.instance, b->var.instance) 
+                && a->var.id == b->var.id;
         case TYPE_OP:
             return strcmp(a->op.operator, b->op.operator) == 0
                 && type_params_equal(a->op.params, b->op.params);
         }
+        return false;
     }
 }
 
