@@ -3,6 +3,7 @@
 
 #include "word.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 typedef enum {
     TYPE_VAR,
@@ -54,6 +55,10 @@ type *type_make_var(void);
 type *type_make_op(const char *operator, type *params);
 
 type *type_make_op_from_args(const char *operator, size_t count, ...);
+
+type *type_make_duplicate(type *type);
+
+bool type_equal(type *a, type *b);
 
 type_inference_return type_infer_type_of_word(word *word, type_env *env);
 
