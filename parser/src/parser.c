@@ -2,9 +2,11 @@
 #include "word.h"
 #include "def.h"
 #include "source_file.h"
+#include "type.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 /**
  * Compares the type of the token at @ref index in the @ref tokens list and returns 
@@ -113,8 +115,94 @@ static parser_return parse_file_impl(const lexer_token **tokens, const char *fil
     return (parser_return){ .error = PARSER_SUCCESS, .value = source_file_make(file_name, defs) };
 }
 
-static parser_return parse_type_impl(const lexer_token **tokens) {
-    
+parser_type_state *parser_type_state_make(const char *id, type *type, parser_type_state *next) {
+    parser_type_state *ret = malloc(sizeof(parser_type_state));
+    ret->id = id;
+    ret->type = type;
+    ret->next = next;
+    return ret;
+}
+
+type *parser_type_state_find(parser_type_state *state, const char *id) {
+    if (!state) return NULL;
+    return strcmp(state->id, id) == 0 ? type_make_duplicate(state->type) : parser_type_state_find(state->next, id);
+}
+
+static parser_return parse_type_impl(const lexer_token **tokens, parser_type_state *state);
+
+static type *parse_types_impl(const lexer_token **tokens, parser_type_state *state) {
+    parser_return result = parse_type_impl(tokens, state);
+    if (result.error != PARSER_SUCCESS) {
+        return NULL;
+    }
+    type *ret = result.value;
+    ret->next = parse_types_impl(tokens, state);
+    return ret;
+}
+
+static parser_return try_parse_fun_type(const lexer_token **tokens, type *lhs, parser_type_state *state) {
+    if (token_type(*tokens, 0, LEXER_R_ARROW)) {
+        consume(tokens, 1);
+        parser_return result = parse_type_impl(tokens, state);
+        if (result.error) return result;
+        return (parser_return) { .error = PARSER_SUCCESS, .value = type_make_op_from_args("Fun", 2, lhs, result.value), .state = state };
+    } else {
+        return (parser_return) { .error = PARSER_SUCCESS, .value = lhs, .state = state };
+    }
+}
+
+static type *make_pair_type_from_word_param_list(type *list, type *base) {
+    if (!list) return base;
+    base = type_make_op_from_args("Pair", 2, type_make_duplicate(list), base);
+    return make_pair_type_from_word_param_list(list->next, base);
+}
+
+static parser_return parse_type_impl(const lexer_token **tokens, parser_type_state *state) {
+    if (token_type(*tokens, 0, LEXER_ID)) {
+        const char *id = (*tokens)->text;
+        type *type = parser_type_state_find(state, id);
+        if (type == NULL) {
+            type = type_make_var();
+            state = parser_type_state_make(id, type, state);
+        }
+        consume(tokens, 1);
+        return try_parse_fun_type(tokens, type, state);
+    } else if (token_type(*tokens, 0, LEXER_TYPENAME)) {
+        const char *operator = (*tokens)->text;
+        consume(tokens, 1);
+        type *params = NULL;
+        if (token_type(*tokens, 1, LEXER_L_PAREN)) {
+            consume(tokens, 1);
+            params = parse_types_impl(tokens, state);
+            expect(tokens, LEXER_R_PAREN);
+        }
+        return try_parse_fun_type(tokens, type_make_op(operator, params), state);
+    } else if (token_type(*tokens, 0, LEXER_L_PAREN)) {
+        /* Either a pair or a word type. */
+        consume(tokens, 1);
+        type *lhs = parse_types_impl(tokens, state);
+        if (token_type(*tokens, 1, LEXER_DOT)) {
+            /* Parsing a pair type. */
+            consume(tokens, 1);
+            type *rhs = parse_types_impl(tokens, state);
+            if (!rhs) return (parser_return) { .error = PARSER_FAILURE, .value = NULL };
+            expect(tokens, LEXER_R_PAREN);
+            return try_parse_fun_type(tokens, type_make_op_from_args("Pair", 2, lhs, rhs), state);
+        } else if (token_type(*tokens, 1, LEXER_R_PAREN)) {
+            /* Parsing a word type. */
+            consume(tokens, 1);
+            expect(tokens, LEXER_R_ARROW);
+            expect(tokens, LEXER_L_PAREN);
+            type *rhs = parse_types_impl(tokens, state);
+            if (!rhs) return (parser_return) { .error = PARSER_FAILURE, .value = NULL };
+            expect(tokens, LEXER_R_PAREN);
+            type *stack_base = type_make_var();
+            lhs = make_pair_type_from_word_param_list(lhs, stack_base);
+            rhs = make_pair_type_from_word_param_list(rhs, stack_base);
+            return try_parse_fun_type(tokens, type_make_op_from_args("Fun", 2, lhs, rhs), state);
+        }
+    }
+    return (parser_return) { .error = PARSER_FAILURE, .value = NULL };
 }
 
 parser_return parser_parse_def(const lexer_token *tokens) {
@@ -129,6 +217,6 @@ parser_return parser_parse_file(const lexer_token *tokens, const char *file_name
     return parse_file_impl(&tokens, file_name);
 }
 
-parser_return parser_parse_type(const lexer_token *tokens) {
-    return parse_type_impl(&tokens);
+parser_return parser_parse_type(const lexer_token *tokens, parser_type_state *state) {
+    return parse_type_impl(&tokens, state);
 }
